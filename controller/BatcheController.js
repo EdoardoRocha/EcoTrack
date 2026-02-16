@@ -10,40 +10,7 @@ export default class BatcheController {
             ProductId
         } = req.body;
 
-        //Validators
-        if (!quantity) {
-            res.status(422).json({ message: "A quantidade é obrigatória!" });
-            return;
-        };
-        if (isNaN(quantity) || typeof quantity !== 'number') {
-            res.status(422).json({ message: "Formato de quantidade não aceito, por favor envie um número!" })
-            return;
-        };
-        if (!expiry_date) {
-            res.status(422).json({ message: "A validade é obrigatória!" });
-            return;
-        };
-        if (!status) {
-            res.status(422).json({ message: "O Status é obrigatória!" });
-            return;
-        };
-        if (!ProductId) {
-            res.status(422).json({ message: "O Id do produto é obrigatório!" });
-            return;
-        };
-        if (isNaN(ProductId) || typeof ProductId !== 'number') {
-            res.status(422).json({ message: "Formato de preço não aceito, por favor envie um número!" })
-            return;
-        };
-
         try {
-            //Check if exists product
-            const product = await Product.findOne({ where: ProductId });
-            if (!product) {
-                res.status(404).json({ message: "Produto não cadastrado!" });
-                return;
-            }
-
             const batche = {
                 quantity,
                 expiry_date,
@@ -84,7 +51,7 @@ export default class BatcheController {
 
                 let newStatus = batche.status;
 
-                //Apply business rules
+                //Apply business logic
                 switch (true) {
                     case (diffInDays < 0):
                         newStatus = "Critico";

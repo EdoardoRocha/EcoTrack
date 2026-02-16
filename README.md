@@ -1,9 +1,3 @@
-Com base em toda a documentação que revisamos (Arquitetura, Modelagem e Backlog), preparei um **README.md** profissional, focado em destacar suas habilidades técnicas para recrutadores e o valor de negócio do **EcoTrack**.
-
----
-
-# 📝 README.md
-
 # 🟢 EcoTrack - API de Gestão Inteligente de Validade
 
 O **EcoTrack** é uma REST API desenvolvida para resolver um dos maiores gargalos financeiros de pequenos varejistas e estabelecimentos alimentícios: o **prejuízo por vencimento de estoque**.
