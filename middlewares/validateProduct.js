@@ -1,4 +1,8 @@
-export const validateProduct = async (req, res, next) => {
+//Repositorys
+import ProductRepository from "../repository/ProductRepository.js";
+const prodRepo = new ProductRepository();
+
+const validateProduct = async (req, res, next) => {
     const {
         name,
         category,
@@ -28,4 +32,21 @@ export const validateProduct = async (req, res, next) => {
     };
 
     next();
+};
+
+const existProduct = async (req, res, next) => {
+    const id = req.params.id;
+
+    //Validator
+    const productExists = await prodRepo.findOne(id);
+    if (!productExists) {
+        res.status(404).json({ message: "O Produto não existe!" });
+    };
+
+    next();
+};
+
+export {
+    validateProduct,
+    existProduct
 }
