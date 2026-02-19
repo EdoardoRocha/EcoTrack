@@ -18,12 +18,13 @@ const batchRepo = new BatchRepository();
 const batchService = new BatchService(batchRepo, prodRepo);
 const batchController = new BatcheController(batchService);
 
-//Middleware
+//Middlewares
 import { validateBatche } from "../middlewares/validateBatche.js";
+import checkToken from "../middlewares/verifyToken.js";
 
-router.post("/", validateBatche, (req, res) => batchController.addBatche(req, res));
-router.get("/inventory/status", (req, res) => batchController.getBatches(req, res));
-router.patch("/:id/discard", (req, res) => batchController.discardBatche(req, res));
-router.get("/reports/losses", (req, res) => batchController.lossesBatches(req, res));
+router.post("/", checkToken, validateBatche, (req, res) => batchController.addBatche(req, res));
+router.get("/inventory/status", checkToken, (req, res) => batchController.getBatches(req, res));
+router.patch("/:id/discard", checkToken, (req, res) => batchController.discardBatche(req, res));
+router.get("/reports/losses", checkToken, (req, res) => batchController.lossesBatches(req, res));
 
 export default router;
