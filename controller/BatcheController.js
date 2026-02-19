@@ -9,11 +9,17 @@ export default class BatcheController {
 
     async addBatche(req, res) {
         try {
-            const batch = await this.batchService.createNewBatch(req.body);
-            res.status(201).json({
-                message: "Lote cadastrado com sucesso!",
-                batch
-            })
+            const batch = await this.batchService.createNewBatch(req);
+            if (typeof batch == "string") {
+                res.status(403).json({
+                    message: batch
+                })
+            } else {
+                res.status(201).json({
+                    message: "Lote cadastrado com sucesso!",
+                    batch
+                });
+            }
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -21,7 +27,8 @@ export default class BatcheController {
 
     async getBatches(req, res) {
         try {
-            const readyBatches = await this.batchService.getUpdatedBatch()
+            const userId = req.user.id;
+            const readyBatches = await this.batchService.getUpdatedBatch(userId)
             res.status(200).json(readyBatches);
             return;
         } catch (error) {
@@ -32,7 +39,7 @@ export default class BatcheController {
 
     async discardBatche(req, res) {
         try {
-            const discardBatche = await this.batchService.discardBatch(req.params);
+            const discardBatche = await this.batchService.discardBatch(req);
             res.status(201).json(discardBatche ? { message: discardBatche } : { message: "Lote descartado com sucesso!" });
             return;
         } catch (error) {
@@ -43,7 +50,8 @@ export default class BatcheController {
 
     async lossesBatches(req, res) {
         try {
-            const losser = await this.batchService.losser();
+            const userId = req.user.id;
+            const losser = await this.batchService.losser(userId);
             res.status(200).json({ losser });
         } catch (error) {
             res.status(500).json({ message: error.message });

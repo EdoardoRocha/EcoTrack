@@ -1,4 +1,5 @@
 import Batche from "../models/Batches.js";
+import Product from "../models/Products.js";
 
 class BatchRepository {
     async create(data) {
@@ -19,6 +20,16 @@ class BatchRepository {
 
     async destroy(id) {
         return await Batche.destroy({ where: { ProductId: id } });
+    };
+
+    async findAllByUser(userId) {
+        return await Batche.findAll({
+            include: [{
+                model: Product,
+                where: { UserId: userId },
+                attributes: []
+            }]
+        })
     }
 };
 

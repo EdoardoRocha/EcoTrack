@@ -1,3 +1,6 @@
+import { getToken } from "../helpers/get-token.js";
+import { getUserByToken } from "../helpers/get-user-by-token.js";
+
 class BatchService {
     constructor(batchRepository, productRepository) {
         this.batchRepository = batchRepository;
@@ -6,17 +9,32 @@ class BatchService {
 
     async createNewBatch(data) {
         const batch = {
-            quantity: data.quantity,
-            expiry_date: data.expiry_date,
-            status: data.status,
-            ProductId: data.ProductId
-        }
+            quantity: data.body.quantity,
+            expiry_date: data.body.expiry_date,
+            status: data.body.status,
+            ProductId: data.body.ProductId
+        };
+
+        //Get token
+        const token = getToken(data);
+
+        //Get User By Token
+        const user = await getUserByToken(token);
+
+        //Get products
+        const product = await this.productRepository.findByPk(batch.ProductId);
+
+        //If the user.id is different products.UserId then the acess is not possible. 
+        if (user.id !== product.UserId) {
+            return "Esse produto não pertence a você.";
+        };
+
         return await this.batchRepository.create(batch);
     };
 
-    async getUpdatedBatch() {
+    async getUpdatedBatch(userId) {
         //Get the Batches
-        const batches = await this.batchRepository.findAll();
+        const batches = await this.batchRepository.findAllByUser(userId);
 
         //Get today date
         const today = new Date();
@@ -59,7 +77,7 @@ class BatchService {
     };
 
     async discardBatch(data) {
-        const id = data.id;
+        const id = data.params.id;
 
         const batche = await this.batchRepository.findByPk(id);
 
@@ -67,6 +85,18 @@ class BatchService {
         if (!batche) {
             const message = "Lote não encontrado!";
             return message;
+        };
+
+        //Get token
+        const token = getToken(data);
+
+        //Get User By Token
+        const user = await getUserByToken(token);
+
+        //Get products
+        const product = await this.productRepository.findByPk(batche.ProductId);
+        if (user.id !== product.UserId) {
+            return "Esse Lote não pertence a você!";
         };
 
         const selector = {
@@ -80,8 +110,8 @@ class BatchService {
         await this.batchRepository.update(values, selector);
     };
 
-    async losser() {
-        const batches = await this.batchRepository.findAll();
+    async losser(userId) {
+        const batches = await this.batchRepository.findAllByUser(userId);
         let batcheLosser = 0;
 
         for (let i of batches) {

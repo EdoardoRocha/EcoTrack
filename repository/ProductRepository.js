@@ -19,7 +19,11 @@ class ProductRepository {
 
     async findOne(id) {
         return await Product.findOne({ where: { id } })
-    }
+    };
+
+    async findAllByPk(id) {
+        return await Product.findAll(id);
+    };
 
 };
 

@@ -1,23 +1,19 @@
 import { DataTypes } from "sequelize";
 import conn from "../config/db.js";
-import User from "./Users.js";
 
-const Product = conn.define('Products', {
+const User = conn.define('Users', {
     name: {
         type: DataTypes.STRING,
         require: true
     },
-    category: {
+    email: {
         type: DataTypes.STRING,
         require: true
     },
-    unit_price: {
-        type: DataTypes.DECIMAL(10, 2),
+    password: {
+        type: DataTypes.STRING,
         require: true
     }
 });
 
-Product.belongsTo(User);
-User.hasMany(Product);
-
-export default Product;
+export default User;

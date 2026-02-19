@@ -8,6 +8,7 @@ import conn from "./config/db.js";
 //Import Models
 import Batche from "./models/Batches.js";
 import Product from "./models/Products.js";
+import User from './models/Users.js';
 
 const app = express();
 
@@ -19,10 +20,12 @@ app.use(cors());
 
 //Routes
 import ProductsRoutes from "./routes/ProductRoutes.js";
-import BatcheRouter from "./routes/BatcheRoutes.js";
+import BatcheRoutes from "./routes/BatcheRoutes.js";
+import UserRoutes from "./routes/UserRoutes.js";
 
 app.use("/products", ProductsRoutes);
-app.use("/batches", BatcheRouter);
+app.use("/batches", BatcheRoutes);
+app.use("/users", UserRoutes);
 
 conn
     .sync()
