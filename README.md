@@ -1,66 +1,66 @@
-# 🟢 EcoTrack - API de Gestão Inteligente de Validade
+# 🟢 EcoTrack - Gestão Inteligente de Validade e Inventário
 
-O **EcoTrack** é uma REST API desenvolvida para resolver um dos maiores gargalos financeiros de pequenos varejistas e estabelecimentos alimentícios: o **prejuízo por vencimento de estoque**.
+O **EcoTrack** é uma solução de backend desenvolvida para resolver um dos maiores problemas do pequeno varejo: o desperdício de produtos por vencimento. A API permite o controle rigoroso de lotes, automatiza o status de validade e gera relatórios de impacto financeiro, tudo sob uma arquitetura segura e multiusuário.
 
-Diferente de sistemas de inventário comuns, o EcoTrack foca na "vida útil" do produto, oferecendo inteligência de dados para transformar datas de validade em ações estratégicas de vendas ou descarte, calculando o impacto financeiro em tempo real.
+## 🚀 Funcionalidades Principais
 
----
+* **Autenticação JWT:** Sistema completo de registro e login com senhas criptografadas via `bcryptjs`.
+* **Gestão de Lotes (Batches):** Controle individual de quantidades e datas de validade por produto.
+* **Motor de Status Automático:** A API calcula dinamicamente a situação de cada lote a cada consulta:
+* 🔴 **Crítico:** Lotes já vencidos.
+* 🟡 **Alerta:** Vencimento em até 7 dias.
+* 🟢 **Ok:** Prazo de validade seguro.
 
-## 🚀 O Problema e a Solução
 
-### **A Dor**
-
-Muitos empreendedores perdem dinheiro silenciosamente porque não possuem visibilidade sobre quais lotes estão vencendo. O controle manual em planilhas é falho, não emite alertas e não quantifica o prejuízo acumulado.
-
-### **A Solução**
-
-Uma API robusta que gerencia o relacionamento entre **Produtos** e seus múltiplos **Lotes**. O sistema categoriza automaticamente os itens em:
-
-* 🔴 **CRÍTICO:** Já vencidos (Prontos para descarte/cálculo de perda).
-* 🟡 **ALERTA:** Vencem em até 7 dias (Ideal para promoções relâmpago).
-* 🟢 **OK:** Validade segura.
+* **Relatório de Prejuízo:** Cálculo automático do valor financeiro perdido com lotes descartados, baseado no preço unitário do produto.
+* **Isolamento de Dados:** Cada usuário autenticado possui acesso exclusivo aos seus próprios produtos e lotes (Proteção contra IDOR).
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-* **Runtime:** Node.js (v18+)
-* **Framework:** Express.js
-* **Banco de Dados:** MySQL 8.0 (Relacional)
-* **ORM/Query Builder:** Sequelize / `mysql2`
-* **Arquitetura:** MVC (Model-View-Controller)
-* **Infraestrutura:** AWS EC2 (Hospedagem em instância Linux)
+* **Runtime:** [Node.js](https://nodejs.org/) (ES Modules)
+* **Framework:** [Express.js](https://expressjs.com/)
+* **ORM:** [Sequelize](https://sequelize.org/)
+* **Banco de Dados:** [MySQL](https://www.mysql.com/)
+* **Segurança:** JSON Web Tokens (JWT) & Bcryptjs
 
 ---
 
-## 🏗️ Arquitetura e Modelagem
+## 🏗️ Arquitetura do Projeto
 
-O projeto utiliza uma estrutura **1:N (Um para Muitos)**, permitindo que um único produto (ex: Iogurte Morango) tenha vários lotes com datas de validade e quantidades distintas.
+O projeto utiliza uma arquitetura baseada em **Camadas (Layered Architecture)**, garantindo a separação de responsabilidades e facilitando a manutenção:
 
-### Diagrama de Dados Simplificado:
-
-* **Products:** `id`, `name`, `category`, `unit_price`, `created_at`
-* **Batches (Lotes):** `id`, `ProductId (FK)`, `quantity`, `expiry_date`, `status`
-
----
-
-## 🛣️ Endpoints Principais (API Design)
-
-### **Produtos**
-
-* `POST /products` - Cadastra um novo item no catálogo.
-* `GET /products` - Lista produtos com a soma total de todos os seus lotes ativos.
-
-### **Gestão de Lotes & Inteligência**
-
-* `POST /batches` - Adiciona um novo lote (quantidade + validade) a um produto.
-* `GET /inventory/status` - **O Motor de Cálculo:** Retorna os lotes com os status calculados (OK, ALERTA, CRÍTICO).
-* `GET /reports/losses` - **Impacto Financeiro:** Soma o prejuízo total (Quantidade Vencida × Preço de Custo).
-* `PATCH /batches/:id/discard` - Marca um lote como descartado, alimentando o relatório de perdas.
+1. **Controller:** Gerencia as requisições HTTP e as respostas.
+2. **Service:** Contém toda a lógica de negócio (cálculos de datas, validações de posse).
+3. **Repository:** Isola o acesso ao banco de dados (Sequelize), facilitando futuras trocas de banco.
+4. **Model:** Define as entidades do banco de dados e seus relacionamentos (User 1:N Product 1:N Batch).
 
 ---
 
-## ⚙️ Como Executar o Projeto
+## 🛣️ Endpoints da API
+
+### Usuários (`/users`)
+
+* `POST /register`: Cadastro de novo usuário.
+* `POST /login`: Autenticação e retorno do Token.
+
+### Produtos (`/products`) - *Requer Auth*
+
+* `POST /`: Cadastra um novo produto (nome, preço unitário, etc).
+* `GET /`: Lista produtos do usuário logado.
+* `DELETE /:id`: Remove produto e seus lotes associados.
+
+### Lotes (`/batches`) - *Requer Auth*
+
+* `POST /`: Adiciona um lote a um produto existente.
+* `GET /inventory/status`: Lista lotes com status de validade atualizado.
+* `PATCH /:id/discard`: Marca um lote como descartado.
+* `GET /reports/losses`: Retorna o valor total de prejuízo formatado em BRL.
+
+---
+
+## ⚙️ Como Executar
 
 1. **Clone o repositório:**
 ```bash
@@ -76,14 +76,15 @@ npm install
 ```
 
 
-3. **Configure as variáveis de ambiente:**
-Crie um arquivo `.env` na raiz com as credenciais do seu MySQL:
+3. **Configure o ambiente:**
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 ```env
+PORT=3000
 DB_HOST=localhost
 DB_USER=seu_usuario
-DB_PASS=sua_senha
+DB_PASSWORD=sua_senha
 DB_NAME=ecotrack
-PORT=3000
+AUTH_SECRET=sua_chave_secreta_jwt
 
 ```
 
@@ -98,14 +99,6 @@ npm start
 
 ---
 
-## 🌟 Diferenciais Técnicos
+> **Nota Técnica:** O sistema utiliza o método `conn.sync()` para gerenciar a criação automática das tabelas e chaves estrangeiras no MySQL conforme os modelos definidos.
 
-* **Lógica de Negócio Centralizada:** O status de validade não é estático no banco; ele é calculado dinamicamente com base na data atual, garantindo dados sempre frescos.
-* **Tratamento de Erros:** Middlewares para validação de campos obrigatórios e integridade referencial.
-* **Pronto para Produção:** Estrutura preparada para deployment em instâncias AWS utilizando PM2 para gerenciamento de processos.
-
----
-
-> **Desenvolvido por Edoardo Rocha Paz** > *Estudante de Sistemas de Informação - UNI7*
-
----
+Deseja que eu ajude a criar um arquivo de **coleção do Postman ou Insomnia** para que você possa anexar ao repositório e facilitar os testes de quem baixar o projeto?
