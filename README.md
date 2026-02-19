@@ -94,11 +94,3 @@ AUTH_SECRET=sua_chave_secreta_jwt
 npm start
 
 ```
-
-
-
----
-
-> **Nota Técnica:** O sistema utiliza o método `conn.sync()` para gerenciar a criação automática das tabelas e chaves estrangeiras no MySQL conforme os modelos definidos.
-
-Deseja que eu ajude a criar um arquivo de **coleção do Postman ou Insomnia** para que você possa anexar ao repositório e facilitar os testes de quem baixar o projeto?
