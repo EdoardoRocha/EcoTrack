@@ -25,5 +25,6 @@ import checkToken from "../middlewares/verifyToken.js";
 router.get("/", checkToken, (req, res) => prodController.showProducts(req, res));
 router.post("/", checkToken, validateProduct, (req, res) => prodController.addProducts(req, res));
 router.delete("/:id", checkToken, existProduct, (req, res) => prodController.deleteProduct(req, res));
+router.post("/purchase/:id", checkToken, existProduct, (req, res) => prodController.purchaseProduct(req, res));
 
 export default router;

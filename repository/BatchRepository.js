@@ -30,7 +30,7 @@ class BatchRepository {
                 attributes: []
             }]
         })
-    }
+    };
 };
 
 export default BatchRepository;

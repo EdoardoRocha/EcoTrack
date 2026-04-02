@@ -46,4 +46,13 @@ export default class ProductController {
         }
 
     }
+
+    async purchaseProduct(req, res) {
+        try {
+            await this.productService.purchaseProduct(req);
+            res.status(200).json({message: "Lote atualizado com sucesso!"})
+        } catch (error) {
+            res.status(500).json({message: error.message})
+        }
+    }
 }
